@@ -36,8 +36,23 @@ class User extends Model {
     return json;
   }
 
-  async isEmailTaken(email) {
-    const user = await this.constructor.query().findOne({ email });
+  /**
+   * Check if email is taken
+   * @param {string} email - The user's email
+   * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
+   * @returns {Promise<boolean>}
+   */
+  async isEmailTaken(email, excludeUserId) {
+    let user;
+
+    if (excludeUserId) {
+      user = await this.constructor
+        .query()
+        .findOne({ email })
+        .whereNot('userId', excludeUserId);
+    } else {
+      user = await this.constructor.query().findOne({ email });
+    }
 
     return !!user;
   }
@@ -47,8 +62,13 @@ class User extends Model {
     return await bcrypt.hash(password, salt);
   }
 
+  /**
+   * Check if password matches the user's password
+   * @param {string} password
+   * @returns {Promise<boolean>}
+   */
   async isPasswordMatch(password) {
-    return bcrypt.compare(password, this.password);
+    return await bcrypt.compare(password, this.password);
   }
 
   async getSignedJwtToken(userId) {
@@ -57,7 +77,7 @@ class User extends Model {
     });
   }
 
-  async $beforeInsert(context) {
+  async $beforeInsert(queryContext) {
     // Check if email exists
     if (await this.isEmailTaken(this.email)) {
       throw new ApiError(400, 'Email already taken.');
@@ -69,6 +89,13 @@ class User extends Model {
     }
 
     this.password = await this.encryptPassword(this.password);
+  }
+
+  async $beforeUpdate(opt, queryContext) {
+    // Check if password is being updated
+    if (this.password) {
+      this.password = await this.encryptPassword(this.password);
+    }
   }
 }
 

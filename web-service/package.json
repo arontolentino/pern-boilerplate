@@ -1,7 +1,6 @@
 {
-  "name": "web-app-service",
+  "name": "app-service",
   "version": "0.1.0",
-  "author": "Aron Tolentino",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.1.2",

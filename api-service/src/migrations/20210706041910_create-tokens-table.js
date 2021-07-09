@@ -6,21 +6,18 @@ exports.up = async (knex) => {
     table.uuid('userId').notNullable();
     table.string('token').notNullable();
     table
-      .enu(
-        'type',
-        [
-          tokenTypes.REFRESH,
-          tokenTypes.RESET_PASSWORD,
-          tokenTypes.VERIFY_EMAIL,
-        ],
-        { useNative: true, enumName: 'token_type' }
-      )
+      .enu('type', ['refresh', 'resetPassword', 'verifyEmail'])
       .notNullable();
     table.date('expires').notNullable();
     table.boolean('blacklisted').notNullable().defaultTo(false);
-    table.timestamps();
+    table.timestamps(true, true);
 
-    table.foreign('userId').references('userId').inTable('users');
+    table
+      .foreign('userId')
+      .references('userId')
+      .inTable('users')
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE');
   });
 };
 
