@@ -19,7 +19,7 @@ const getUser = catchAsync(async (req, res) => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  res.send(user);
+  res.send({ success: true, data: user });
 });
 
 const updateUser = catchAsync(async (req, res) => {

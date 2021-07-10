@@ -54,7 +54,7 @@ const queryUsers = async (reqQuery) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return User.findById(id);
+  return User.query().findById(id);
 };
 
 /**
