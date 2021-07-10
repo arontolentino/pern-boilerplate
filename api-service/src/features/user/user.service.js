@@ -1,26 +1,62 @@
+const httpStatus = require('http-status');
 const User = require('./user.model');
 const ApiError = require('../../utils/ApiError');
 
-const createUser = async (reqBody) => {
-  const { name, email, password } = reqBody;
+/**
+ * Create a user
+ * @param {Object} userBody
+ * @returns {Promise<User>}
+ */
+const createUser = async (userBody) => {
+  const { name, email, password } = userBody;
 
-  // Create user
-  const user = await User.query().insert({
-    name,
-    email,
-    password,
-  });
+  const user = await User.query().insert({ name, email, password });
 
   return user;
 };
 
 /**
+ * Query for users
+ * @param {Object} filter - Mongo filter
+ * @param {Object} options - Query options
+ * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
+ * @param {number} [options.limit] - Maximum number of results per page (default = 10)
+ * @param {number} [options.page] - Current page (default = 1)
+ * @returns {Promise<QueryResult>}
+ */
+const queryUsers = async (reqQuery) => {
+  const users = await User.query()
+    .modify(function (queryBuilder) {
+      console.log(reqQuery);
+
+      if (reqQuery.name) {
+        queryBuilder.where('name', reqQuery.name);
+      }
+
+      if (reqQuery.role) {
+        queryBuilder.where('role', reqQuery.role);
+      }
+
+      if (reqQuery.sortBy && reqQuery.sortDirection) {
+        queryBuilder.orderBy(reqQuery.sortBy, reqQuery.sortDirection);
+      }
+
+      if (reqQuery.sortBy) {
+        queryBuilder.orderBy(reqQuery.sortBy);
+      }
+    })
+    .page(reqQuery.page - 1, reqQuery.pageSize);
+
+  return users;
+};
+
+/**
  * Get user by id
- * @param {ObjectId} userId
+ * @param {ObjectId} id
  * @returns {Promise<User>}
  */
-const getUserById = async (userId) => {
-  return User.query().findById(userId);
+const getUserById = async (id) => {
+  return User.findById(id);
 };
 
 /**
@@ -40,23 +76,36 @@ const getUserByEmail = async (email) => {
  */
 const updateUserById = async (userId, updateBody) => {
   const user = await getUserById(userId);
-
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-
   if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
+  Object.assign(user, updateBody);
+  await user.save();
+  return user;
+};
 
-  await user.$query().patch(updateBody);
-
+/**
+ * Delete user by id
+ * @param {ObjectId} userId
+ * @returns {Promise<User>}
+ */
+const deleteUserById = async (userId) => {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  await user.remove();
   return user;
 };
 
 module.exports = {
   createUser,
+  queryUsers,
   getUserById,
   getUserByEmail,
   updateUserById,
+  deleteUserById,
 };

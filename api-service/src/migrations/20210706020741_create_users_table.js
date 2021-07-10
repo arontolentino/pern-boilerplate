@@ -4,7 +4,7 @@ exports.up = async (knex) => {
     table.string('name').notNullable();
     table.string('email').notNullable();
     table.string('password').notNullable();
-    table.enu('type', ['user', 'admin']).notNullable().defaultTo('user');
+    table.enu('role', ['user', 'admin']).notNullable().defaultTo('user');
     table.boolean('isEmailVerified').notNullable().defaultTo(false);
     table.timestamps(true, true);
   });
