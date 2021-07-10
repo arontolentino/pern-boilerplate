@@ -10,9 +10,7 @@ const generateToken = async (user) => {
   const token = await user.getSignedJwtToken(user.userId);
 
   const options = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
     httpOnly: true,
   };
 
@@ -55,8 +53,6 @@ const logout = async (refreshToken) => {
     })
     .returning('*');
 
-  console.log(refreshTokenDoc);
-
   if (!refreshTokenDoc) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
   }
@@ -68,10 +64,7 @@ const logout = async (refreshToken) => {
  * @returns {Promise<Object>}
  */
 const refreshAuth = async (refreshToken) => {
-  const refreshTokenDoc = await tokenService.verifyToken(
-    refreshToken,
-    tokenTypes.REFRESH
-  );
+  const refreshTokenDoc = await tokenService.verifyToken(refreshToken, tokenTypes.REFRESH);
 
   const user = await userService.getUserById(refreshTokenDoc.userId);
 
@@ -90,10 +83,7 @@ const refreshAuth = async (refreshToken) => {
  * @returns {Promise}
  */
 const resetPassword = async (resetPasswordToken, newPassword) => {
-  const resetPasswordTokenDoc = await tokenService.verifyToken(
-    resetPasswordToken,
-    tokenTypes.RESET_PASSWORD
-  );
+  const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, tokenTypes.RESET_PASSWORD);
 
   const user = await userService.getUserById(resetPasswordTokenDoc.userId);
 
@@ -115,10 +105,7 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
  * @returns {Promise}
  */
 const verifyEmail = async (verifyEmailToken) => {
-  const verifyEmailTokenDoc = await tokenService.verifyToken(
-    verifyEmailToken,
-    tokenTypes.VERIFY_EMAIL
-  );
+  const verifyEmailTokenDoc = await tokenService.verifyToken(verifyEmailToken, tokenTypes.VERIFY_EMAIL);
 
   const user = await userService.getUserById(verifyEmailTokenDoc.userId);
 

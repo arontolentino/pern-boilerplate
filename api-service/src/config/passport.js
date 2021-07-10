@@ -14,7 +14,6 @@ const jwtVerify = async (payload, done) => {
       throw new Error('Invalid token type');
     }
 
-    console.log(payload.sub);
     const user = await User.query().findById(payload.sub);
 
     if (!user) {

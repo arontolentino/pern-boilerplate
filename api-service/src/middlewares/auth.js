@@ -9,8 +9,6 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
   }
   req.user = user;
 
-  console.log(user);
-
   if (requiredRights.length) {
     const userRights = roleRights.get(user.role);
 

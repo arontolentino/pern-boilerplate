@@ -46,10 +46,7 @@ class User extends Model {
     let user;
 
     if (excludeUserId) {
-      user = await this.constructor
-        .query()
-        .findOne({ email })
-        .whereNot('userId', excludeUserId);
+      user = await this.constructor.query().findOne({ email }).whereNot('userId', excludeUserId);
     } else {
       user = await this.constructor.query().findOne({ email });
     }
@@ -92,6 +89,10 @@ class User extends Model {
   }
 
   async $beforeUpdate(opt, queryContext) {
+    if (this.email && (await this.isEmailTaken(this.email))) {
+      throw new ApiError(400, 'Email already taken.');
+    }
+
     // Check if password is being updated
     if (this.password) {
       this.password = await this.encryptPassword(this.password);
