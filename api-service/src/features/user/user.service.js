@@ -92,8 +92,9 @@ const deleteUserById = async (userId) => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  await user.remove();
-  return user;
+  const deletedUser = await user.$query().delete().returning('*');
+
+  return deletedUser;
 };
 
 module.exports = {
