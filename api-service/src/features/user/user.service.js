@@ -7,10 +7,8 @@ const ApiError = require('../../utils/ApiError');
  * @param {Object} userBody
  * @returns {Promise<User>}
  */
-const createUser = async (userBody) => {
-  const { name, email, password } = userBody;
-
-  const user = await User.query().insert({ name, email, password });
+const createUser = async (reqBody) => {
+  const user = await User.query().insert(reqBody);
 
   return user;
 };

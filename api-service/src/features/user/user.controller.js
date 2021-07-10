@@ -6,16 +6,12 @@ const userService = require('./user.service');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
-  res.status(httpStatus.CREATED).send(user);
+  res.status(httpStatus.CREATED).send({ success: true, data: user });
 });
 
 const getUsers = catchAsync(async (req, res) => {
-  // const filter = pick(req.query, ['name', 'role']);
-  // const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  // const result = await userService.queryUsers(filter, options);
-  const result = await userService.queryUsers(req.query);
-
-  res.send({ success: true, data: result });
+  const users = await userService.queryUsers(req.query);
+  res.send({ success: true, data: users });
 });
 
 const getUser = catchAsync(async (req, res) => {
