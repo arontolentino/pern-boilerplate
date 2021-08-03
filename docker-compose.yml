@@ -7,17 +7,17 @@ services:
     ports:
       - '5432:5432'
 
-  app-service:
-    stdin_open: true
-    build:
-      context: ./app-service
-      dockerfile: Dockerfile
-    ports:
-      - '3000:3000'
-    volumes:
-      - /app/node_modules
-      - ./app-service:/app
-    restart: on-failure
+  # app-service:
+  #   stdin_open: true
+  #   build:
+  #     context: ./app-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '3000:3000'
+  #   volumes:
+  #     - /app/node_modules
+  #     - ./app-service:/app
+  #   restart: on-failure
 
   next-service:
     build:
